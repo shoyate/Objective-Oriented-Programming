@@ -266,7 +266,7 @@ if __name__ == "__main__":
     # order7 = Order(book_pride, user_alice, time.time() + 2)
     # order8 = Order(book_enders, user_bob, time.time() + 2)
     my_catalogue = Catalogue.load_catalogue(f"{os.getcwd()}\\saved\\TestCatalogue.catalogue")
-# Write a console interface for the library
+
     print("Welcome to the library!")
     print("Please select an option:")
     print("1. List all categories")
