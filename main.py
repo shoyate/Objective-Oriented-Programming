@@ -287,7 +287,7 @@ if __name__ == "__main__":
             print("Please select a category:")
             my_catalogue.list_categories()
             category = input("Please select a category: ")
-            Category.list_books(category)
+            Category.list_books(my_catalogue.categories[int(category)])
         elif option == "1":
             my_catalogue.list_categories()
         elif option == "3":
