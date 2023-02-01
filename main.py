@@ -27,7 +27,7 @@ class Book:
     def list_all_books(self,title,author,isbn,category):
         """ List all the books in the library """
         print(f"{self.title} by {self.author} in {self.category.name}")
-        
+
 
     # def load_book_from_json(self, file):
     #     """ Load a book from a json file \n
@@ -61,7 +61,7 @@ class Category:
         """ List all the books in the category """
         for book in self.books:
             print(f"{book.title} by {book.author}")
-    
+
 
 class Catalogue(metaclass=Singleton):
     """ Catalogue class represents the library catalogue, contains all the categories"""
@@ -87,6 +87,12 @@ class Catalogue(metaclass=Singleton):
             if books:
                 category.list_books()
                 print("")
+
+    def get_category_by_name(self, name):
+        for category in self.categories:
+            if category.name == name:
+                return category
+        return None
 
     def save_catalogue(self, file, mkdirs=True, override_if_exists=False) -> bool:
         """ """
@@ -280,34 +286,57 @@ if __name__ == "__main__":
     print("9. Save catalogue")
     print("10. Load catalogue")
     print("11. Exit")
-    
+
     while True:
+        print("-----------------------------------")
         option = input("Please select an option: ")
-        if option == "2":
-            print("Please select a category:")
-            my_catalogue.list_categories()
-            category = input("Please select a category: ")
-            Category.list_books(my_catalogue.categories[int(category)])
-        elif option == "1":
-            my_catalogue.list_categories()
+
+        if option == "1":
+            do_list_books = True if input(f"List books aswell? (y/n) ") == "y" else False
+            my_catalogue.list_categories(books=do_list_books)
+
+        elif option == "2":
+            my_catalogue.list_categories(books=False)
+            category_name = input("Please select a category: ")
+            chosen_category = my_catalogue.get_category_by_name(category_name)
+
+            if chosen_category:
+                chosen_category.list_books()
+            else:
+                print(f"Category {category_name} not found")
+
+
         elif option == "3":
             User.list_all_users()
+
         elif option == "4":
             Catalogue.list_orders()
+
         elif option == "5":
             title = input("Please enter the title of the book: ")
             author = input("Please enter the author of the book: ")
             isbn = input("Please enter the ISBN of the book: ")
+            category_name = input("Please enter the category of the book: ")
             book = Book(title, author, isbn)
-            Category.add_book(book)
+            category = my_catalogue.get_category_by_name(category_name)
+            if category:
+                category.add_book(book)
+            else:
+                if input("Category not found. Do you want to create it? (y/n) ").lower() == "y":
+                    category = Category(category_name)
+                    my_catalogue.add_category(category)
+                    category.add_book(book)
+
         elif option == "6":
             name = input("Please enter the name of the category: ")
             category = Category(name)
             Catalogue.add_category(category)
+
         elif option == "7":
             name = input("Please enter the name of the user: ")
             user = User(name)
             Catalogue.add_user(user)
+
         elif option == "8":
             Catalogue.list_books()
             book_id = input("Please enter the ID of the book: ")
@@ -315,15 +344,17 @@ if __name__ == "__main__":
             user_id = input("Please enter the ID of the user: ")
             order = Order(Catalogue.books[int(book_id)], Catalogue.users[int(user_id)], time.time() + 2)
             Catalogue.add_order(order)
+
         elif option == "9":
             Catalogue.save_catalogue(f"{os.getcwd()}\\saved\\TestCatalogue.catalogue")
+
         elif option == "10":
             Catalogue.load_catalogue(f"{os.getcwd()}\\saved\\TestCatalogue.catalogue")
+
         elif option == "11":
             break
         else:
             print("Please enter a valid option")
-
 
     # my_catalogue = Catalogue.load_catalogue(f"{os.getcwd()}\\saved\\TestCatalogue.catalogue")
     # my_catalogue.list_categories()
